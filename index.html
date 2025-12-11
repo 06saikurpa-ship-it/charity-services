@@ -1,89 +1,336 @@
-%%html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiveItForward - Donate Items to People in Need</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f5f5f5;
-        }
-        header {
-            background: #2878e0;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        section {
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-        h2 {
-            color: #2878e0;
-        }
-        .button {
-            background: #2878e0;
-            color: white;
-            padding: 12px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-            display: inline-block;
-        }
-        .button:hover {
-            background: #185cad;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 20px;
-            color: #777;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GiveItForward — Donate Items</title>
+  <style>
+    /* Reset + variables */
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --accent: #2878e0;
+      --accent-2:#4f8ef0;
+      --bg: #f0f4f8;
+      --text: #102a43;
+      --card: rgba(255,255,255,0.9);
+      --glass: rgba(255,255,255,0.6);
+      --muted: #6b7280;
+      --shadow: 0 8px 24px rgba(2,6,23,0.08);
+      --radius: 14px;
+    }
+    body.dark{
+      --accent: #77a9ff;
+      --accent-2:#9fc2ff;
+      --bg:#071428;
+      --text:#e6eef8;
+      --card: rgba(10,16,24,0.6);
+      --glass: rgba(255,255,255,0.03);
+      --muted:#9aa4b2;
+      --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    body.warm{
+      --accent:#b76b2f;
+      --accent-2:#daa977;
+      --bg:#fbf0e6;
+      --text:#4a2c1a;
+      --card: rgba(255,255,255,0.95);
+      --glass: rgba(255,255,255,0.88);
+      --muted:#6b4f3a;
+    }
+    html,body{height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);scroll-behavior:smooth}
+    a{color:inherit}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:999;background:var(--card);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(0,0,0,0.04)}
+    nav .left{display:flex;align-items:center;gap:18px}
+    nav h1{font-size:18px;color:var(--accent);margin-right:6px}
+    nav .links{display:flex;gap:14px}
+    nav .links a{font-weight:600;padding:6px 8px;border-radius:8px}
+    nav .links a:hover{background:linear-gradient(90deg,rgba(0,0,0,0.03),transparent)}
+    #themeToggle{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+
+    /* HERO */
+    .hero{height:44vh;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:white}
+    .hero .wrap{max-width:980px}
+    .hero h2{font-size:36px;margin-bottom:8px;text-shadow:0 3px 18px rgba(0,0,0,0.45)}
+    .hero p{opacity:0.95}
+
+    /* MAIN */
+    main{max-width:1100px;margin:34px auto;padding:0 18px}
+    section{padding:28px 0;scroll-margin-top:84px}
+    section h2{font-size:22px;margin-bottom:10px;color:var(--accent)}
+    section p{color:var(--muted);line-height:1.6}
+
+    /* cards */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+    .card{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:220px}
+    .card img{width:100%;height:170px;object-fit:cover;border-radius:10px;margin-bottom:12px;background:#eceff3}
+    .card h3{margin:8px 0 6px}
+    .card p{color:var(--muted);flex:0 0 auto}
+    .card .actions{margin-top:auto}
+    .button{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    .button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text);font-weight:600}
+
+    /* how list */
+    ol{margin-left:18px;margin-top:10px;color:var(--muted);line-height:1.6}
+    ol li{margin-bottom:8px}
+
+    /* footer */
+    footer{padding:24px;text-align:center;color:var(--muted);margin-top:30px}
+
+    /* modal */
+    .modalOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.55);z-index:600}
+    .modal{width:96%;max-width:680px;background:var(--card);padding:18px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,0.5)}
+    .modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    label{display:block;margin-top:8px;color:var(--muted);font-size:14px}
+    input,textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);margin-top:6px;background:transparent;color:var(--text)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    @media(max-width:720px){ .hero h2{font-size:26px} .card img{height:150px} }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>GiveItForward</h1>
-        <p>Connecting generous donors with people who truly need help</p>
-    </header>
+  <nav>
+    <div class="left">
+      <h1>GiveItForward</h1>
+      <div class="links">
+        <a href="#about" data-target="about">About</a>
+        <a href="#donate" data-target="donate">Donate</a>
+        <a href="#request" data-target="request">Request</a>
+        <a href="#how" data-target="how">How It Works</a>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <button id="themeToggle" aria-pressed="false">🌙 Dark Mode</button>
+    </div>
+  </nav>
 
-    <section>
-        <h2>About the Service</h2>
-        <p>GiveItForward is a simple charity platform where people can donate unused items, and people in need can request them. Our goal is to reduce waste, support communities, and make it easier for everyone to help each other.</p>
+  <div class="hero" id="hero" role="img" aria-label="volunteers">
+    <div class="wrap">
+      <h2>Share What You Don't Need</h2>
+      <p>Together we connect generous donors with people who truly need help — reducing waste and increasing hope.</p>
+    </div>
+  </div>
+
+  <main>
+    <section id="about">
+      <h2>About the Service</h2>
+      <p>GiveItForward connects donors with people in need. We coordinate safe collection, reduce waste and support local communities.</p>
     </section>
 
-    <section>
-        <h2>Donate Items</h2>
-        <p>If you have clothes, electronics, toys, or household items you no longer use, you can offer them here. Your donation can make a real difference.</p>
-        <a class="button" href="https://forms.gle/" target="_blank">Offer an Item</a>
+    <section id="donate">
+      <h2>Donate Items</h2>
+      <div class="card-grid">
+        <div class="card">
+          <img class="rnd" data-set="clothes" alt="Clothing donation image"/>
+          <h3>Offer Clothing & Accessories</h3>
+          <p>Gently used clothes help families stay warm.</p>
+          <div class="actions"><button class="button" id="offerItemBtn">Offer an Item</button></div>
+        </div>
+
+        <div class="card">
+          <img class="rnd" data-set="home" alt="Household donation image"/>
+          <h3>Household & Electronics</h3>
+          <p>Cookware, small appliances, and usable electronics welcome.</p>
+          <div class="actions"><button class="button" id="offerItemBtn2">Offer an Item</button></div>
+        </div>
+      </div>
     </section>
 
-    <section>
-        <h2>Request Items</h2>
-        <p>If you or someone you care for is in need, you can submit a request. We match requests with available items donated by the community.</p>
-        <a class="button" href="https://forms.gle/" target="_blank">Request Help</a>
+    <section id="request">
+      <h2>Request Items</h2>
+      <div class="card-grid">
+        <div class="card">
+          <img class="rnd" data-set="baby" alt="Baby items"/>
+          <h3>Need Clothing or Baby Items?</h3>
+          <p>Submit a request discreetly and we'll try to match donations nearby.</p>
+          <div class="actions"><button class="button" id="requestHelpBtn">Request Help</button></div>
+        </div>
+
+        <div class="card">
+          <img class="rnd" data-set="furniture" alt="Furniture"/>
+          <h3>Furniture & Large Items</h3>
+          <p>Tell us what you need — we will try to help.</p>
+          <div class="actions"><button class="button" id="requestItemsBtn">Request Items</button></div>
+        </div>
+      </div>
     </section>
 
-    <section>
-        <h2>How It Works</h2>
-        <ul>
-            <li>Donors list the items they want to give.</li>
-            <li>People in need submit their requests.</li>
-            <li>We match both sides and arrange safe collection or delivery.</li>
-        </ul>
+    <section id="how">
+      <h2>How It Works</h2>
+      <ol>
+        <li>Donors list items they want to give along with pickup/delivery options.</li>
+        <li>People in need submit their requests.</li>
+        <li>We match donors with recipients and arrange collection safely.</li>
+      </ol>
     </section>
+  </main>
 
-    <footer>
-        <p>© 2025 GiveItForward Charity Platform</p>
-    </footer>
+  <footer>© 2025 GiveItForward — Community Support</footer>
+
+  <!-- modal -->
+  <div class="modalOverlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <strong id="modalTitle">Form</strong>
+        <button id="modalClose" class="button ghost" style="border-radius:8px;background:transparent;color:var(--text);border:1px solid rgba(0,0,0,0.06)">Close</button>
+      </header>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+/* ---------- GRACEFUL IMAGE LOADING ---------- */
+const imageSets = {
+  clothes: [
+    "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1000&q=80"
+  ],
+  home: [
+    "https://images.unsplash.com/photo-1581093588401-22d996b3a87d?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1000&q=80"
+  ],
+  baby: [
+    "https://images.unsplash.com/photo-1522770179533-24471fcdba45?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1520975916994-6c1a7f3c1a72?auto=format&fit=crop&w=1000&q=80"
+  ],
+  furniture: [
+    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1000&q=80"
+  ],
+  hero: [
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?auto=format&fit=crop&w=1400&q=80"
+  ]
+};
+
+function setRandomImages(){
+  document.querySelectorAll('img.rnd').forEach(img=>{
+    const set = img.dataset.set;
+    const list = imageSets[set] || [];
+    if(list.length){
+      img.src = list[Math.floor(Math.random()*list.length)];
+      // graceful fallback to a data-URI placeholder if load fails
+      img.onerror = ()=> { img.style.background = "#e9eef5"; img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='100%25' height='100%25' fill='%23e9eef5'/%3E%3C/svg%3E"; };
+    }
+  });
+
+  // hero background
+  const hero = document.getElementById('hero');
+  const h = imageSets.hero[Math.floor(Math.random()*imageSets.hero.length)];
+  hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)), url(${h})`;
+}
+
+/* ---------- THEME TOGGLE (persistent) ---------- */
+const themeToggle = document.getElementById('themeToggle');
+function applyTheme(name){
+  document.body.classList.remove('dark','warm');
+  if(name==='dark') document.body.classList.add('dark');
+  if(name==='warm') document.body.classList.add('warm');
+  localStorage.setItem('gif_theme', name);
+  themeToggle.textContent = name==='dark' ? '☀️ Light Mode' : name==='warm' ? '🌤 Warm Mode' : '🌙 Dark Mode';
+}
+themeToggle.addEventListener('click', ()=>{
+  const current = localStorage.getItem('gif_theme') || 'light';
+  const next = current==='light' ? 'dark' : current==='dark' ? 'warm' : 'light';
+  applyTheme(next);
+});
+applyTheme(localStorage.getItem('gif_theme') || 'light');
+
+/* ---------- NAV SMOOTH SCROLL (works even if dynamic) ---------- */
+document.querySelectorAll('nav .links a').forEach(a=>{
+  a.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const id = a.getAttribute('data-target');
+    const el = document.getElementById(id);
+    if(!el) return;
+    const navH = document.querySelector('nav').offsetHeight;
+    const top = el.getBoundingClientRect().top + window.scrollY - navH - 8;
+    window.scrollTo({top, behavior:'smooth'});
+  });
+});
+
+/* ---------- MODAL HELPERS ---------- */
+const overlay = document.getElementById('modalOverlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+function openModal(title, html){
+  modalTitle.textContent = title;
+  modalBody.innerHTML = html;
+  overlay.style.display = 'flex';
+  overlay.setAttribute('aria-hidden','false');
+}
+function closeModal(){
+  overlay.style.display = 'none';
+  overlay.setAttribute('aria-hidden','true');
+  modalBody.innerHTML = '';
+}
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+
+/* ---------- FORM SUBMISSIONS (save to localStorage) ---------- */
+function wireFormSubmit(formId, storageKey){
+  const form = document.getElementById(formId);
+  if(!form) return;
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const data = {};
+    new FormData(form).forEach((v,k)=> data[k]=v);
+    data._t = Date.now();
+    const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    arr.push(data);
+    localStorage.setItem(storageKey, JSON.stringify(arr));
+    alert('Submitted — thank you!');
+    closeModal();
+  });
+}
+
+/* ---------- BUTTONS (open appropriate modal) ---------- */
+document.getElementById('offerItemBtn').addEventListener('click', ()=>{
+  openModal('Offer Clothing & Accessories', `
+    <form id="offerForm">
+      <label>Your name<input name="name" required /></label>
+      <label>Item description<textarea name="item" required></textarea></label>
+      <label>Pickup or delivery (notes)<input name="pickup" /></label>
+      <div style="margin-top:12px"><button class="button" type="submit">Submit Offer</button></div>
+    </form>`);
+  setTimeout(()=>wireFormSubmit('offerForm','gif_offers'), 50);
+});
+document.getElementById('offerItemBtn2').addEventListener('click', ()=>{
+  openModal('Offer Household / Electronics', `
+    <form id="offerForm2">
+      <label>Your name<input name="name" required /></label>
+      <label>Item description<textarea name="item" required></textarea></label>
+      <label>Pickup or delivery (notes)<input name="pickup" /></label>
+      <div style="margin-top:12px"><button class="button" type="submit">Submit Offer</button></div>
+    </form>`);
+  setTimeout(()=>wireFormSubmit('offerForm2','gif_offers'), 50);
+});
+document.getElementById('requestHelpBtn').addEventListener('click', ()=>{
+  openModal('Request Clothing / Baby Items', `
+    <form id="reqForm">
+      <label>Your name<input name="name" required /></label>
+      <label>What do you need?<textarea name="needs" required></textarea></label>
+      <label>Contact (optional)<input name="contact" /></label>
+      <div style="margin-top:12px"><button class="button" type="submit">Submit Request</button></div>
+    </form>`);
+  setTimeout(()=>wireFormSubmit('reqForm','gif_requests'), 50);
+});
+document.getElementById('requestItemsBtn').addEventListener('click', ()=>{
+  openModal('Request Furniture / Large Items', `
+    <form id="reqForm2">
+      <label>Your name<input name="name" required /></label>
+      <label>Describe what you need<textarea name="needs" required></textarea></label>
+      <label>Contact (optional)<input name="contact" /></label>
+      <div style="margin-top:12px"><button class="button" type="submit">Submit Request</button></div>
+    </form>`);
+  setTimeout(()=>wireFormSubmit('reqForm2','gif_requests'), 50);
+});
+
+/* ---------- INIT ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{ setRandomImages(); }catch(e){ console.warn('image init failed', e); }
+});
+</script>
 </body>
 </html>
